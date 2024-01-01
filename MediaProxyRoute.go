@@ -13,11 +13,12 @@ import (
 )
 
 var (
-	mediaPathTemplate = "./data/%s/%s"
+	mediaPathTemplate = "%s/%s/%s"
 	downloadMutex     sync.Mutex
 )
 
 func MediaProxyHandler(c *gin.Context) {
+
 	mediaURL := c.Query("origin")
 	if mediaURL == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'origin' parameter"})
@@ -29,10 +30,15 @@ func MediaProxyHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to extract domain"})
 		return
 	}
+	configParser := GetConfigParser()
+	dataDir := configParser.Get("DATA_DIR")
+	if dataDir == "" {
+		dataDir = "./data"
+	}
 
-	domainDir := fmt.Sprintf("./data/%s", domain)
+	domainDir := fmt.Sprintf("%s/%s", dataDir, domain)
 
-	mediaPath := fmt.Sprintf(mediaPathTemplate, domain, filepath.Base(mediaURL))
+	mediaPath := fmt.Sprintf(mediaPathTemplate, dataDir, domain, filepath.Base(mediaURL))
 
 	downloadMutex.Lock()
 	defer downloadMutex.Unlock()
