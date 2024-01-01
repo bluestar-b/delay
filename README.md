@@ -1,4 +1,4 @@
-# File delay server
+# Stupid File delay server
 
 ## How it Works
 
