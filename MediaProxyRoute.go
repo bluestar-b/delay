@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -63,34 +61,4 @@ func MediaProxyHandler(c *gin.Context) {
 	c.Header("Access-Control-Allow-Methods", "GET")
 	c.Header("Access-Control-Allow-Headers", "Content-Type")
 	c.File(mediaPath)
-}
-
-func downloadMedia(mediaURL, mediaPath string) error {
-	response, err := http.Get(mediaURL)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
-
-	file, err := os.Create(mediaPath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, response.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func extractDomain(url string) string {
-	parts := strings.Split(url, "//")
-	if len(parts) >= 2 {
-		domain := strings.Split(parts[1], "/")[0]
-		return domain
-	}
-	return ""
 }
