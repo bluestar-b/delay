@@ -57,8 +57,5 @@ func MediaProxyHandler(c *gin.Context) {
 		fmt.Printf("Media downloaded successfully for domain '%s'.\n", domain)
 	}
 
-	c.Header("Access-Control-Allow-Origin", "*")
-	c.Header("Access-Control-Allow-Methods", "GET")
-	c.Header("Access-Control-Allow-Headers", "Content-Type")
 	c.File(mediaPath)
 }

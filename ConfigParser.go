@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	HOST_NAME string `yaml:"HOST_NAME"`
-	HOST_PORT string `yaml:"HOST_PORT"`
-	DATA_DIR  string `yaml:"DATA_DIR"`
+	ALLOW_ORIGINS []string `yaml:"ALLOW_ORIGINS"`
+	HOST_NAME     string   `yaml:"HOST_NAME"`
+	HOST_PORT     string   `yaml:"HOST_PORT"`
+	DATA_DIR      string   `yaml:"DATA_DIR"`
 }
 
 type ConfigParser struct {

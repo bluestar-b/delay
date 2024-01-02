@@ -3,31 +3,53 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	configParser := GetConfigParser()
-	Host := configParser.Get("HOST_NAME")
-	Port := configParser.Get("HOST_PORT")
-	DataDir := configParser.Get("DATA_DIR")
-	if Host == "" {
-		Host = "localhost"
-	}
 
-	if Port == "" {
-		Port = "5000"
-	}
+	Host := getString(configParser.Get("HOST_NAME"), "localhost")
+	Port := getString(configParser.Get("HOST_PORT"), "5000")
+	DataDir := getString(configParser.Get("DATA_DIR"), "")
 
 	address := fmt.Sprintf("%s:%s", Host, Port)
-	log.Printf("Server running on %s\n", address)
-	log.Printf("Data Directory is %s\n", DataDir)
-	router := gin.Default()
+	log.Printf("Server Running on %s\n", address)
+	if DataDir != "" {
+		log.Printf("Data Directory is %s\n", DataDir)
+	}
+	origins := getStringSlice(configParser.Get("ALLOW_ORIGINS"))
+	if len(origins) > 0 {
+		log.Printf("Allowed Origins: %s", strings.Join(origins, ", "))
+	}
 
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:  origins,
+		AllowMethods:  []string{"GET"},
+		AllowHeaders:  []string{"Content-Type"},
+		ExposeHeaders: []string{"Content-Length"},
+	}))
 	router.GET("/delay", MediaProxyHandler)
 	router.GET("/api/info", InfoHandler)
 
-	address = fmt.Sprintf("%s:%s", Host, Port)
 	router.Run(address)
+}
+
+func getString(value interface{}, defaultValue string) string {
+	if str, ok := value.(string); ok && str != "" {
+		return str
+	}
+	return defaultValue
+}
+
+func getStringSlice(value interface{}) []string {
+	if slice, ok := value.([]string); ok {
+		return slice
+	}
+	return nil
 }
